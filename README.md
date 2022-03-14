@@ -14,6 +14,7 @@
   - [Tools](#tools)
     - [Input-output Redirection](#input-output-redirection)
     - [Text analysis](#text-analysis)
+    - [Archiving and Compressing](#archiving-and-compressing)
 
 ## Boot Process
 
@@ -263,4 +264,56 @@ grep '^http.*tcp.*services$' /etc/services
 # Exnteded regular expression
 egrep '^http.*(tcp|udp).*service$' /etc/services
 grep -E '^http.*(tcp|udp).*service$' /etc/services
+```
+
+### Archiving and Compressing
+
+```bash
+# Create archive, preserve extended attributes (ACL,SElinux security context)
+# verbose, save ownership and permission
+tar --xattrs -cvpf etc.tar /etc
+
+# Retrieve archive size
+du -h etc.tar
+32M     etc.tar
+
+# Archive and compres with gzip, display size
+tar --gzip --xattrs -cpf etc.tar.gz /etc && du -h etc.tar.gz
+7.6M    etc.tar.gz
+
+# Archive and compress with bzip, display size
+tar --bzip2 --xattrs -cpf etc.tar.bz2 /etc && du -h etc.tar.bz2
+5.9M    etc.tar.bz2
+
+# Archive and compress with xz, display size
+sudo tar --xz --xattrs -cpf etc.tar.xz /etc && du -h etc.tar.xz
+5.2M    etc.tar.xz
+
+# Display archive contents
+tar -tf etc.tar
+tar --gzip -tf etc.tar.gz
+tar --bzip2 -tf etc.tar.bz2
+tar --xz -tf etc.tar.xz
+
+# Extract archive contents in current folder and in a specific one
+tar --xattrs -xvpf etc.tar
+tar --xattrs -xvpf etc.tar -C ~/Downloads
+```
+
+Is it also possible to use `gzip` directly, without `tar`. Same approach works for `bzip2`, `xz` and `zip`.
+
+```bash
+# Display size before compression
+du -h services
+680K    services
+
+# Compress file
+gzip services
+
+# Display size after compression
+du -h services.gz
+140K    services.gz
+
+# Unzip file
+gunzip services.gz
 ```
