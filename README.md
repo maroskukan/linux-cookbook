@@ -15,6 +15,7 @@
     - [Input-output Redirection](#input-output-redirection)
     - [Text analysis](#text-analysis)
     - [Archiving and Compressing](#archiving-and-compressing)
+    - [System logs](#system-logs)
 
 ## Boot Process
 
@@ -316,4 +317,76 @@ du -h services.gz
 
 # Unzip file
 gunzip services.gz
+```
+
+### System logs
+
+There are two logging systems by default, rsyslog and journald.
+
+**rsyslog**
+
+- Compatible with syslogd
+- Persistent logs
+- Logs are text files
+- Can log remotely
+
+```bash
+# Verify rsyslog status
+systemctl status rsyslog
+
+# Configuration file describing log rules
+cat /etc/rsyslog.conf
+
+# Display log messages excluding systemd
+grep -v 'systemd' /var/log/messages
+
+# Follow new messages
+tail -f /var/log/messages
+
+# Log rotation cron job and settings
+cat /etc/cron.daily/logrotate
+cat /etc/logrotate.conf
+
+# Writing a log message
+logger "My custom log message"
+```
+
+**journald**
+
+- Part of systemd
+- Nonpresistent by default
+- Logs are binary
+- Logs in to RAM `/var/run`
+- Very fast
+
+```bash
+# View all entries
+journalctl
+
+# View kernel entries
+journalctl -k
+
+# View cron command entries
+journalctl /sbin/crond
+
+# View systemd unit entries
+journalctl -u crond
+
+# Follow new messages
+journalctl -f
+
+# Storing logs persistently
+mkdir -p /var/log/journal
+systemctl restart systemd-journald
+
+# View contents of journal directory
+ll /var/log/journal
+total 0
+drwxr-xr-x. 2 root root 28 Mar 15 11:47 75eca5b7822e46a2b16e7ffca28ad943
+
+# Filter entries by date and time
+journalctl --since "2022-02-22 22:22:22"
+journalctl --since "2022-02-22" --until "2022-02-28"
+journalctl --since yesterdat
+journalctl --since 09:00 --until "1 hour ago"
 ```
