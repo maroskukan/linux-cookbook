@@ -16,6 +16,10 @@
     - [Text analysis](#text-analysis)
     - [Archiving and Compressing](#archiving-and-compressing)
     - [System logs](#system-logs)
+  - [Managing Software](#managing-software)
+    - [Package managers](#package-managers)
+      - [RPM](#rpm)
+      - [DNF](#dnf)
 
 ## Boot Process
 
@@ -389,4 +393,189 @@ journalctl --since "2022-02-22 22:22:22"
 journalctl --since "2022-02-22" --until "2022-02-28"
 journalctl --since yesterdat
 journalctl --since 09:00 --until "1 hour ago"
+```
+
+
+## Managing Software
+
+### Package managers
+
+The difference between repository based package managers such as (`apt`, `yum`, `dnf`) and software installation tools such as `dpkg` and `rpm` is that the installation tools handles installation and managers handle searching and downloading software from repository and handle any dependencies.
+
+
+#### RPM
+
+Qeurying database
+
+```bash
+# Query RPM Database
+rpm -qa
+
+# Query specific package
+rpm -qi bash
+
+# Query list of file paths for package
+rpm -ql yum
+
+# Query a list of documentation file paths for package
+rpm -qd yum
+
+# Query a list of configuration file paths for package
+rpm -qc yum
+
+# Query file to determine the source package
+rpm -qf /bin/bash
+
+# Query for features that a package provides
+rpm -q --provides bash
+
+# Query package dependencies
+rpm -q --requires bash
+
+# Query package changes
+rpm -q --changelog bash
+```
+
+Inspecing a package
+
+```bash
+# Download packaged and dependencies
+dnf download httpd --resolve
+
+# Inspect a package
+rpm -qip httpd-*
+rpm -qlp httpd-*
+```
+
+#### DNF
+
+Originially `YUM` package manager was created for Yellow Dog Linux and was later enhanced and named `DNF` which became the default package manager since RHEL8. The benefit of DNF is that it resolves the package dependencies automatically. It also supports package groups (e.g. `Develoment Tools`).
+
+Repositories contain RPM packages and client maintains local list of repositories.
+
+```bash
+# Display the configured software repositories
+dnf repolist
+Updating Subscription Management repositories.
+repo id                                   repo name
+rhel-8-for-x86_64-appstream-rpms          Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
+rhel-8-for-x86_64-baseos-rpms             Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
+
+# Show duplicates, in repos, in list/search commands
+dnf --showduplicates list firewalld-0.9.3-7*
+
+
+# List a package or groups of packages
+dnf list --all | head
+Last metadata expiration check: 14:01:38 ago on Tue 15 Mar 2022 07:38:34 PM CET.
+Installed Packages
+GConf2.x86_64                                          3.2.6-22.el8                                        @AppStream
+ModemManager.x86_64                                    1.10.8-4.el8                                        @anaconda
+ModemManager-glib.x86_64                               1.10.8-4.el8                                        @anaconda
+NetworkManager.x86_64                                  1:1.32.10-4.el8                                     @anaconda
+NetworkManager-adsl.x86_64                             1:1.32.10-4.el8                                     @anaconda
+NetworkManager-bluetooth.x86_64                        1:1.32.10-4.el8                                     @anaconda
+NetworkManager-config-server.noarch                    1:1.32.10-4.el8                                     @anaconda
+
+# List installed packages
+dnf list --installed
+
+# List installed packages for which udpate exists
+dnf list --updates
+
+# List packages available in repository but not installed
+dnf list --available
+
+# Display details about a package or group of packages
+dnf info firewalld
+Last metadata expiration check: 14:06:03 ago on Tue 15 Mar 2022 07:38:34 PM CET.
+Installed Packages
+Name         : firewalld
+Version      : 0.9.3
+Release      : 7.el8
+Architecture : noarch
+Size         : 2.0 M
+Source       : firewalld-0.9.3-7.el8.src.rpm
+Repository   : @System
+From repo    : anaconda
+Summary      : A firewall daemon with D-Bus interface providing a dynamic firewall
+URL          : http://www.firewalld.org
+License      : GPLv2+
+Description  : firewalld is a firewall service daemon that provides a dynamic customizable
+             : firewall with a D-Bus interface.
+
+Available Packages
+Name         : firewalld
+Version      : 0.9.3
+Release      : 7.el8_5.1
+Architecture : noarch
+Size         : 502 k
+Source       : firewalld-0.9.3-7.el8_5.1.src.rpm
+Repository   : rhel-8-for-x86_64-baseos-rpms
+Summary      : A firewall daemon with D-Bus interface providing a dynamic firewall
+URL          : http://www.firewalld.org
+License      : GPLv2+
+Description  : firewalld is a firewall service daemon that provides a dynamic customizable
+             : firewall with a D-Bus interface.
+
+# List package's dependencies and what packages provide them
+dnf repoquery --deplist firewalld
+```
+
+Managing packege groups.
+
+```bash
+# List installed and available package groups
+dnf group list [--all | --installed | --hidden]
+Last metadata expiration check: 14:10:13 ago on Tue 15 Mar 2022 07:38:34 PM CET.
+Available Environment Groups:
+   Server
+   Minimal Install
+   Workstation
+   Virtualization Host
+   Custom Operating System
+Installed Environment Groups:
+   Server with GUI
+Installed Groups:
+   Container Management
+   Headless Management
+Available Groups:
+   RPM Development Tools
+   .NET Core Development
+   Scientific Support
+   Smart Card Support
+   Security Tools
+   Development Tools
+   Legacy UNIX Compatibility
+   Network Servers
+   Graphical Administration Tools
+   System Tools
+
+# Display information about a group
+dnf group info "Development Tools"
+```
+
+Search for a package.
+
+```bash
+dnf search firewalld
+```
+
+Install and remove a package or package group.
+
+```bash
+# Install package
+dnf install -y tree
+
+# Uninstall package
+dnf remove tree
+
+# Uninstall unused dependencies
+dnf autoremove tree
+
+# Reinstall package
+dnf reinstall tree
+
+# Upgrade package
+dnf upgrade firewalld
 ```
