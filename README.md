@@ -4,6 +4,8 @@
   - [Boot Process](#boot-process)
     - [Emergecy Mode](#emergecy-mode)
     - [Password Recovery](#password-recovery)
+      - [Option A](#option-a)
+      - [Option B](#option-b)
     - [Default Kernel](#default-kernel)
     - [Default Target](#default-target)
   - [Services](#services)
@@ -29,7 +31,9 @@ In order to enter emergency mode or target press `e` at default grub entry. Then
 
 ### Password Recovery
 
-At main grub entry, press `e`. And append `rd.break` to kernel line (contains `vmlinuz` keyword). Press `Ctrl-x` to finish booting. Press `Ctrl-X` to boot. After boot System automatically mounts the existing root file system in read only mode at `/sysroot`. You need to remount using read write mode. Afterwards, change the root file system path and update the root password.
+#### Option A
+
+In order to stop the boot process at `initramfs`. Press `e` at the main grub entry and append `rd.break` to kernel line (contains `vmlinuz` keyword). Press `Ctrl-x` to finish booting. Press `Ctrl-X` to boot. After boot System automatically mounts the existing root file system in read only mode at `/sysroot`. You need to remount using read write mode. Afterwards, change the root file system path and update the root password.
 
 ```bash
 # Verify existing mount settings
@@ -56,6 +60,37 @@ exit
 ```
 
 Once the `selinux-autorelabel` is completed the machine is restarted and you can log in using newly set password.
+
+#### Option B
+
+Once again, you need to stop the boot process at `initramfs`. Press `e` at the main grub entry and append `rd.break` and `enforcing=0` to the line containing `vmlinuz` keyword. Press `Ctrl+x` to continue the boot process.
+
+> **Info**: You can optionally remove the `rhgb` and `quiet` arguments.
+
+```bash
+# Mount sysroot using read write mode
+mount -o remount,rw /sysroot
+
+# Change root file system to /sysroot
+chroot /sysroot
+
+# Update root password and exit chroot
+passwd ; exit
+
+# Mount sysroot using read-only mode and exit
+mount -o remount,ro /sysroot ; exit
+```
+
+Once you log as `root` with new password, restore the SElinix security context of the `/etc/shadow` from `unlabeled_t` to `shadow_t`.
+
+```bash
+# Restore the context for /etc/shadow
+restorecon -v /etc/shadow
+
+# Update SElinux configuration from Permissive to Enforcing
+setenforce 1
+```
+
 
 ### Default Kernel
 
