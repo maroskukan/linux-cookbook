@@ -29,7 +29,9 @@
     - [Initial RAM disk](#initial-ram-disk)
       - [Initrd](#initrd)
       - [Initramfs](#initramfs)
-    - [Kernel Developer packages](#kernel-developer-packages)
+    - [Development packages](#development-packages)
+    - [Compliation](#compliation)
+  - [Device Drivers](#device-drivers)
 
 ## Boot Process
 
@@ -731,6 +733,57 @@ dev      etc                 initqueue-finished  lib                netroot  pre
 ```
 
 
-### Kernel Developer packages
+### Development packages
 
 The `kernel-devel` package provides kernel headers and makefiles for building kernel modules. After installation, these are located under `/usr/src/kernels/$(uname -r)` folder.
+
+### Compliation
+
+In order to compile a kernel we first need to download and unpack the source code.
+
+```bash
+wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.9.9.tar.xz
+sudo tar -Jxvf linux-3.9.9.tar.xz -C /usr/src/kernels
+```
+> Note: Running the `wget` in CentOS 6.10 I had to include `--no-check-certificate` argument to download the kernel source files.
+
+Next, we need to creata symlink for the `/usr/src/linux` to point to this directory.
+
+```bash
+sudo ln -s /usr/src/kernels/linux-3.9.9 /usr/src/linux
+```
+
+Next, we need to install `Development Tools` group package and `ncurses-devel`, `bc` package.
+
+```bash
+sudo yum groupinfo "Development Tools"
+sudo yum groupinstall -y "Development Tools"
+sudo yum install -y ncurses-devel bc
+```
+
+The process for compiling a kernel is as follows:
+
+1. Navigate to `/usr/src/linux` folder
+2. Clean the environment with `make clean` or `make mrproper`
+3. Configure kernel options with `make menuconfig`
+4. Compile the kernel `make bzImage`
+5. Compile the loadable modules with `make modules`
+6. Copy modules to correct directory with `make modules_install`
+7. Copy kernel to `/boot` create initramfs and update Grub config with `make install`
+
+> Note: I recommend to follow above steps with root prileges, for example using interactive session with `sudo -i`
+
+Once completed, verify the Grub configuration at `/etc/grub.conf`. There should be new entry corresponding to new kernel which you can select in boot menu. When happy copy it to `/boot/grub/grub.cfg` to ensure it is picked up on next boot.
+
+> Note: In order to add support for Hyper-V host, in step 3, you need to include some more [flags](https://dietrichschroff.blogspot.com/2013/03/hyper-v-compile-linux-kernel-with.html).
+
+
+## Device Drivers
+
+Device drivers often referred to as modules are loaded as required into the running kernel. The currently loaded modules can be seen using `lsmod` command wich uses `/proc/modules` as backend. The `modprobe -l` lists all available modules.
+
+To load a module you can use `modprobe` following with a name of the module. You can also specify an module option (e.g. `modprobe -v sr_mod xa_test=1`). In order to persist this change you need to create a new file in `/etc/modprobe.d/sr_mod.conf` with content of `options sr_mod xa_test=1` for example.
+
+To unload use `modprobe` with `-r` argument following with a name of the module.
+
+To view module dependencies and options use `modinfo` following with a name of the module. In order to display the loaded module options values, use in case of `sr_mod` module `cat /sys/module/sr_mod/parameters/xa_test`.
