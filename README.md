@@ -24,6 +24,12 @@
       - [DNF](#dnf)
   - [Kernel](#kernel)
     - [Runtime management](#runtime-management)
+    - [Documentation](#documentation)
+    - [Kernel Files](#kernel-files)
+    - [Initial RAM disk](#initial-ram-disk)
+      - [Initrd](#initrd)
+      - [Initramfs](#initramfs)
+    - [Kernel Developer packages](#kernel-developer-packages)
 
 ## Boot Process
 
@@ -643,3 +649,88 @@ In order to view options that were supplied to kernel at boot time, view the `/p
 cat /proc/cmdline
 ro root=/dev/mapper/vg_centos6-lv_root rd_NO_LUKS LANG=en_US.UTF-8 rd_LVM_LV=vg_centos6/lv_swap net.ifnames=0 biosdevname=0 elevator=noop no_timer_check  rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=129M@48M rd_LVM_LV=vg_centos6/lv_root  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM rhgb quiet
 ```
+
+### Documentation
+
+For rpm based systems the kernel documentation is available through the `kernel-doc` package. Once installed the docs are available at `/usr/share/doc/kernel-doc-$(uname -r | cut -d"-" -f1)/Documentation`
+
+For Ubuntu the documentation is installed with the kernel source code.
+
+Finally, the web based version is avaialble at [kernel.org](https://www.kernel.org/doc/)
+
+
+### Kernel Files
+
+The kernel files are located in `/boot` directory.
+
+Here you an find the compressed kernel `vmlinuz-$(uname -r)`. In order to get more detail about compression used use `file` command.
+
+```bash
+file /boot/vmlinuz-2.6.32-754.35.1.el6.x86_64
+/boot/vmlinuz-2.6.32-754.35.1.el6.x86_64: Linux kernel x86 boot executable bzImage, version 2.6.32-754.35.1.el6.x86_64 (moc, RO-rootFS, swap_dev 0x4, Normal VGA
+```
+
+
+### Initial RAM disk
+
+The Initial RAM disk is also located in this folder. It is responsible for loading a temporary root file system during the boot processs. It allows for the real root fs to be checked and modules to be loaded.
+
+There are two types of Initial RAM disks:
+
+#### Initrd
+
+The `initrd` used prior to kernel 2.6.13 , is compressed file-system image mounted through `/dev/ram`. The file-system module used in initrd must be compiled into the kernel, ofthen `ext2` but some use `cramfs`.
+
+As you can see below Ubuntu 5.04 (2.6.10) uses initial RAM disk `initrd` as our Initial RAM disk:
+
+```bash
+sudo -i
+file /boot/initrd.img-$(uname -r)
+initrd.img-2.6.10-5-amd64-generic: Linux Compressed ROM File System data, little endian size 4083712 version #2 sorted_dirs CRC 0x36ffcfdc, edition 0, 2807 blocks, 289 files
+```
+
+Since this is a file system by itself, we can access files by mounting it using `mount`.
+
+```bash
+sudo -i
+mount -t sysfs /boot/initrd.img-$(uname -r) /mnt
+ls /mnt
+block  bus  class  devices  firmware  kernel  module  power
+```
+
+#### Initramfs
+
+The `initramfs` used with kernel 2.6.13 onwards. This is `cpio` archive which is unpacked by kernel to `tmpfs` which becomes the initial root file system. Does not require file system or block device drivers to be compiled into the kernel.
+
+As you can see below Centos 6 uses initial RAM File System `initramfs` as our Initial RAM disk:
+
+```bash
+sudo -i
+file /boot/initramfs-$(uname -r).img
+/boot/initramfs-2.6.32-754.35.1.el6.x86_64.img: gzip compressed data, from Unix, last modified: Tue Oct  4 02:30:14 2022, max compression
+```
+
+Upon copying this file and adding a `.gz` extension it can be decompressed.
+
+```bash
+cp /boot/initramfs-$(uname -r).img /tmp/initramfs-$(uname -r).img.gz
+gunzip /tmp/initramfs-$(uname -r).img.gz
+```
+
+Now we can extract the content using `cpio`.
+
+```bash
+mkdir /tmp/init
+cd /tmp/init
+cpio -id < ../initramfs-$(uname -r).img
+
+ls
+bin      dracut-004-411.el6  init                initqueue-settled  lib64    pre-mount    pre-udev  sys      usr
+cmdline  emergency           initqueue           initqueue-timeout  mount    pre-pivot    proc      sysroot  var
+dev      etc                 initqueue-finished  lib                netroot  pre-trigger  sbin      tmp
+```
+
+
+### Kernel Developer packages
+
+The `kernel-devel` package provides kernel headers and makefiles for building kernel modules. After installation, these are located under `/usr/src/kernels/$(uname -r)` folder.
