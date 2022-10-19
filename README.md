@@ -8,7 +8,7 @@
       - [Option B](#option-b)
     - [Default Kernel](#default-kernel)
     - [Default Target](#default-target)
-  - [Services](#services)
+  - [Service Control](#service-control)
     - [Service Unit File](#service-unit-file)
     - [Managing Services](#managing-services)
   - [Networking](#networking)
@@ -30,7 +30,7 @@
       - [Initrd](#initrd)
       - [Initramfs](#initramfs)
     - [Development packages](#development-packages)
-    - [Compliation](#compliation)
+    - [Compilation](#compilation)
   - [Device Drivers](#device-drivers)
 
 ## Boot Process
@@ -121,13 +121,30 @@ systemctl set-default multi-user.target
 ```
 
 
-## Services
+## Service Control
 
-Services in Linux are often referred to as daemons. In modern Linux distributions `systemd` is usually responsible for managing other services and is the first process that is started.
+Services in Linux are often referred to as daemons. In modern Linux distributions `systemd` is responsible for managing other services and is the first process that is started by kernel.
+
+Alternatives to Systemd include OpenRC, s6, SysVinit, Upstart and more.
+
+In order to quickly determine which one is used, look at first process.
+
+```bash
+# Output from Centos 6.10
+ps -fp 1
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 20:00 ?        00:00:00 /sbin/init
+
+# Output from Centos 7.x
+ps -fp 1
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  1 20:13 ?        00:00:01 /usr/lib/systemd/systemd --switched-root --system --deserialize 22
+```
+
 
 ### Service Unit File
 
-In order to display service unit file's state you can use the following command:
+Systemd uses unit files. In order to display service unit file's state you can use the following command:
 
 ```bash
 # State options:
@@ -737,7 +754,7 @@ dev      etc                 initqueue-finished  lib                netroot  pre
 
 The `kernel-devel` package provides kernel headers and makefiles for building kernel modules. After installation, these are located under `/usr/src/kernels/$(uname -r)` folder.
 
-### Compliation
+### Compilation
 
 In order to compile a kernel we first need to download and unpack the source code.
 
