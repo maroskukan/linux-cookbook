@@ -2,7 +2,7 @@
 
 - [Linux Cookbook](#linux-cookbook)
   - [Boot Process](#boot-process)
-    - [Emergecy Mode](#emergecy-mode)
+    - [Emergency Mode](#emergency-mode)
     - [Password Recovery](#password-recovery)
       - [Option A](#option-a)
       - [Option B](#option-b)
@@ -22,10 +22,12 @@
     - [Package managers](#package-managers)
       - [RPM](#rpm)
       - [DNF](#dnf)
+  - [Kernel](#kernel)
+    - [Runtime management](#runtime-management)
 
 ## Boot Process
 
-### Emergecy Mode
+### Emergency Mode
 
 In order to enter emergency mode or target press `e` at default grub entry. Then append `systemd.unit=emergecy.targed` to kernel line (contains `vmlinuz` keyword). Press `Ctrl-x` to finish booting. Once booted provide root password, once maintenance is completed press `Ctrk+d` to finish the boot process.
 
@@ -613,4 +615,31 @@ dnf reinstall tree
 
 # Upgrade package
 dnf upgrade firewalld
+```
+
+
+## Kernel
+
+### Runtime management
+
+In order to retrieve details about current running kernel use the `uname` command. It supports various options such as `-s` for Kernel name, `-n` for computer name. Full list can be displayed using `--help`.
+
+```bash
+uname -a
+Linux centos6.localdomain 2.6.32-754.35.1.el6.x86_64 #1 SMP Sat Nov 7 12:42:14 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+```
+
+The arguments are useful in situations, where you need to refer to current running kernel. For example the following command displays the kernel options that were configured.
+
+```bash
+cat /boot/config-$(uname -r)
+```
+
+It uses the `/proc/version` as backend for retrieving this information.
+
+In order to view options that were supplied to kernel at boot time, view the `/proc/cmdline` file.
+
+```bash
+cat /proc/cmdline
+ro root=/dev/mapper/vg_centos6-lv_root rd_NO_LUKS LANG=en_US.UTF-8 rd_LVM_LV=vg_centos6/lv_swap net.ifnames=0 biosdevname=0 elevator=noop no_timer_check  rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=129M@48M rd_LVM_LV=vg_centos6/lv_root  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM rhgb quiet
 ```
