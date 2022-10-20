@@ -33,6 +33,8 @@
     - [Development packages](#development-packages)
     - [Compilation](#compilation)
   - [Device Drivers](#device-drivers)
+  - [Tips](#tips)
+    - [SSH Session Hangout](#ssh-session-hangout)
 
 ## Boot Process
 
@@ -833,3 +835,10 @@ To load a module you can use `modprobe` following with a name of the module. You
 To unload use `modprobe` with `-r` argument following with a name of the module.
 
 To view module dependencies and options use `modinfo` following with a name of the module. In order to display the loaded module options values, use in case of `sr_mod` module `cat /sys/module/sr_mod/parameters/xa_test`.
+
+
+## Tips
+
+### SSH Session Hangout
+
+To close an unresponsive SSH session where your terminal hangs, press `Enter` and then type `~.`. The session closes immediately returning you back to prompt.
