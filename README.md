@@ -16,6 +16,7 @@
   - [Tools](#tools)
     - [Input-output Redirection](#input-output-redirection)
     - [Text analysis](#text-analysis)
+    - [Searching](#searching)
     - [Archiving and Compressing](#archiving-and-compressing)
     - [System logs](#system-logs)
   - [Managing Software](#managing-software)
@@ -308,13 +309,13 @@ Grep utility is one of the most popular tools when it comes to analyzing text. I
 Below are some examples:
 
 ```bash
-# Case Insitive Search
+# Case Insensitive Search
 grep -i 'root' /etc/passwd
 
 # Find all files ending with .txt that contain apache in their name
 find / -name *.txt | grep apache
 
-# Exlcude empty lines using anchors (^,$) and -v (invert) option
+# Exclude empty lines using anchors (^,$) and -v (invert) option
 grep -v '^$' /etc/ssh/sshd_config
 
 # Character class placement
@@ -328,10 +329,38 @@ grep 'user[![:digit:]]' file.txt
 # Basic regular expression
 grep '^http.*tcp.*services$' /etc/services
 
-# Exnteded regular expression
+# Extended regular expression
 egrep '^http.*(tcp|udp).*service$' /etc/services
 grep -E '^http.*(tcp|udp).*service$' /etc/services
 ```
+
+
+### Searching
+
+Find utility is great for locating files and folders based on text patterns.
+
+Below are some examples:
+
+```bash
+# Find all files ending with .pdf in /usr/share/doc folder and sub-folders
+# and print them (default action)
+find /usr/share/doc -name '*.pdf' -print
+
+# Find all files ending with .pdf in /usr/share/doc folder and sub-folders
+# and copy them to current directory
+find /usr/share/doc -name '*.pdf' -exec cp {} . \;
+
+# Find all files ending with .pdf in current directory and sub-sub-directories
+# and delete them
+find -name '*.pdf' -delete
+
+# Find all symlinks in the /etc directory
+find /etc -maxdepth 1 -type l
+
+# Find all files with size larger then 10M and print their size
+find /boot -size +10000k -type f -exec du -h {} \;
+```
+
 
 ### Archiving and Compressing
 
