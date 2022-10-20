@@ -276,7 +276,9 @@ Unnamed pipe `|` sends output of one command as input to another.
 ip add show dev eth0 | grep global
 ```
 
-Redirect can change the default output  `>` (overwrite), `>>` (append) for STDOUT  and `2>`, `2>>` for STDERR or all output `&>` pr `&>>` from screen to filesystem.
+Redirect can change the default output  `>` or `1>` (overwrite), `>>` or `1>>` (append) for STDOUT and `2>`, `2>>` for STDERR or all output `&>` pr `&>>` from screen to filesystem.
+
+To prevent accidental overwrites using `>` we can change bash option `noclobber` to `on` with `set -o clobber` command.
 
 In order to send output to a file and screen:
 
