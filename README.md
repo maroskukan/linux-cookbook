@@ -297,6 +297,28 @@ You can also redirect file into a command input (STDIN) using `<`.
 sort < /home/lsout.txt > /home/sorted.txt
 ```
 
+Named pipe care often used for inter process communications. To create a named pipe use the `mkfifo` command.
+
+```bash
+mkfifo mypipe
+
+stat -c %F $_
+fifo
+```
+
+To test this pipe, open a another terminal session and send some STDOUT to the pipe.
+
+```bash
+ls > mypipe
+```
+
+On the first session, read the pipe content:
+
+```bash
+wc -l < mypipe
+```
+
+
 ### Text analysis
 
 Grep utility is one of the most popular tools when it comes to analyzing text. It supports basic as well as extended regular expressions. Some common command line options include:
