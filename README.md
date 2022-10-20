@@ -291,6 +291,18 @@ find /etc 2> etcerr.txt | sort | tee etcsort.txt | wc -l
 find /etc &> /dev/null
 ```
 
+Tee is especially useful when you need to perform a redirection using `sudo`. For example, consider this scenario:
+
+```bash
+sudo echo '127.0.0.1 bhole' >> /etc/hosts
+```
+
+You will receive a `Permission denied` error because the redirection falls back to standard user permission. To resolve this you can use `tee`.
+
+```bash
+echo '127.0.0.1   bhole' | sudo tee -a /etc/hosts
+```
+
 You can also redirect file into a command input (STDIN) using `<`.
 
 ```bash
