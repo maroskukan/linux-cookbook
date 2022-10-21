@@ -16,6 +16,8 @@
   - [Tools](#tools)
     - [Input-output Redirection](#input-output-redirection)
     - [Text analysis](#text-analysis)
+      - [Grep](#grep)
+      - [Gawk](#gawk)
     - [Searching](#searching)
     - [Archiving and Compressing](#archiving-and-compressing)
     - [System logs](#system-logs)
@@ -335,6 +337,8 @@ wc -l < mypipe
 
 ### Text analysis
 
+#### Grep
+
 Grep utility is one of the most popular tools when it comes to analyzing text. It supports basic as well as extended regular expressions. Some common command line options include:
 
 - `-i` - Ignore case
@@ -370,6 +374,16 @@ grep '^http.*tcp.*services$' /etc/services
 # Extended regular expression
 egrep '^http.*(tcp|udp).*service$' /etc/services
 grep -E '^http.*(tcp|udp).*service$' /etc/services
+```
+
+
+#### Gawk
+
+Gawk is another popular utility when it comes to analyzing and filtering text data.
+
+```bash
+# Display default shell for root user
+awk -F: '/^root/{ print $1 " is using " $7}' /etc/passwd
 ```
 
 
