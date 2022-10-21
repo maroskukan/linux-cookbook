@@ -411,7 +411,12 @@ find /etc -maxdepth 1 -type l
 
 # Find all files with size larger then 10M and print their size
 find /boot -size +10000k -type f -exec du -h {} \;
+
+# Find all files that belong to user which does not exist
+# add -delete to also cleanup these files
+find /home /var -nouser
 ```
+
 
 
 ### Archiving and Compressing
