@@ -37,6 +37,7 @@
   - [Device Drivers](#device-drivers)
   - [Tips](#tips)
     - [SSH Session Hangout](#ssh-session-hangout)
+    - [Bash Session Recording](#bash-session-recording)
 
 ## Boot Process
 
@@ -897,3 +898,30 @@ To view module dependencies and options use `modinfo` following with a name of t
 ### SSH Session Hangout
 
 To close an unresponsive SSH session where your terminal hangs, press `Enter` and then type `~.`. The session closes immediately returning you back to prompt.
+
+
+### Bash Session Recording
+
+The `script` utility can be used to record the current session to named pipe where it can be seen by other user.
+
+```bash
+# User 1 creates a new named pipe and redirects output of script
+mkfifo /tmp/mypipe
+script -f /tmp/mypipe
+```
+
+```bash
+# User 2 read the pipe
+cat /tmp/mypipe
+```
+
+This also works using a standard file and doing a tail on another session.
+
+```bash
+# User 1 creates a new file and redirects output of script
+> /tmp/mypipe
+script -f /tmp/mypipe
+
+# User 2 tails the file
+tail /tmp/mypipe
+```
