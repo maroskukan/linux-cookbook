@@ -35,6 +35,7 @@
     - [Development packages](#development-packages)
     - [Compilation](#compilation)
   - [Device Drivers](#device-drivers)
+    - [Kernel Installation](#kernel-installation)
   - [Tips](#tips)
     - [SSH Session Hangout](#ssh-session-hangout)
     - [Bash Session Recording](#bash-session-recording)
@@ -891,6 +892,46 @@ To load a module you can use `modprobe` following with a name of the module. You
 To unload use `modprobe` with `-r` argument following with a name of the module.
 
 To view module dependencies and options use `modinfo` following with a name of the module. In order to display the loaded module options values, use in case of `sr_mod` module `cat /sys/module/sr_mod/parameters/xa_test`.
+
+
+### Kernel Installation
+
+Sometimes you need to install a specific kernel version. In order to do so, first list all available packages in the repository.
+
+```bash
+yum list --showduplicates kernel
+```
+
+Then, pick one of them and install:
+
+```bash
+yum install kernel-3.10.0-1160.66.1.el7
+```
+
+This will also update the GRUB2 configuration file `/boot/grub2/grub.cfg` (in case of BIOS based machine). The newly installed kernel will be selected as the default one.
+
+To change the default kernel selection, you can use `grubby`.
+
+```bash
+grubby --default-kernel
+```
+
+```bash
+grubby --set-default grubby --set-default /boot/vmlinuz-3.10.0-1160.76.1.el7.x86_64
+```
+
+To display kernel settings for all or specific kernel:
+
+```bash
+grubby --info=ALL
+grubby --info /boot/vmlinuz-3.10.0-1160.76.1.el7.x86_64
+```
+
+To change the options for specific entry:
+
+```bash
+grubby --remove-args="rhgb quiet" --update-kernel /boot/vmlinuz-3.10.0-1160.76.1.el7.x86_64
+```
 
 
 ## Tips
