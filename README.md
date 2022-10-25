@@ -315,6 +315,26 @@ You can also redirect file into a command input (STDIN) using `<`.
 sort < /home/lsout.txt > /home/sorted.txt
 ```
 
+For programs that cannot accept STDIN as argument using unnamed pipe, you can use the `xargs` utility:
+
+```bash
+# Prints 1 2 3 4 5
+seq 5 | xargs echo
+
+# Alphabetically print all users on system
+cut -d: -f1 < /etc/passwd | sort | xargs
+
+# Print full path for all files in current folder
+/bin/ls | xargs -I {} echo "$PWD/{}"
+
+# Print an argument in new process each second
+seq 5 | xargs -n 1 -P 1 bash -c 'echo sequence no.$0 ran in process $$; sleep 1'
+
+# Speeding up find exec flag with xargs
+find -type f -name "*.text" -exec rm {} \;
+find -type f -name "*.text" | xargs rm {}
+```
+
 Named pipe care often used for inter process communications. To create a named pipe use the `mkfifo` command.
 
 ```bash
