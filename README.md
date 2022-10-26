@@ -11,6 +11,7 @@
   - [Service Control](#service-control)
     - [Service Unit File](#service-unit-file)
     - [Managing Services](#managing-services)
+  - [Job Control](#job-control)
   - [Networking](#networking)
   - [Date and Time](#date-and-time)
   - [Tools](#tools)
@@ -227,6 +228,38 @@ systemctl (disable | enable ) atd
 
 # Verify if service automatic start is enabled
 systemctl is-enabled atd
+```
+
+
+## Job Control
+
+In order to start a long running application in background, append `&` at the end of the line.
+
+```bash
+sleep 1000&
+```
+
+To list existing running jobs use `jobs` command. The following `+` sign displays the currently selected job. To put in in foreground just use `fg` command.
+
+```bash
+fg
+```
+
+In order to suspend a running job send control signal `SIGTSTP` using `CTRL-Z` also described as `^Z`.
+
+In order to kill a running job send control signal `SIGINT` using `CTRL-C` also described as `^C`.
+
+To list all available control signals use `stty -a`.
+
+```bash
+stty -a
+speed 38400 baud; rows 96; columns 116; line = 0;
+intr = ^C; quit = ^\; erase = ^?; kill = ^U; eof = ^D; eol = <undef>; eol2 = <undef>; swtch = <undef>; start = ^Q;
+stop = ^S; susp = ^Z; rprnt = ^R; werase = ^W; lnext = ^V; flush = ^O; min = 1; time = 0;
+-parenb -parodd -cmspar cs8 -hupcl -cstopb cread -clocal -crtscts
+-ignbrk -brkint -ignpar -parmrk -inpck -istrip -inlcr -igncr icrnl ixon -ixoff -iuclc -ixany -imaxbel -iutf8
+opost -olcuc -ocrnl onlcr -onocr -onlret -ofill -ofdel nl0 cr0 tab0 bs0 vt0 ff0
+isig icanon iexten echo echoe echok -echonl -noflsh -xcase -tostop -echoprt echoctl echoke
 ```
 
 
