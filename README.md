@@ -637,6 +637,9 @@ rpm -q --requires bash
 
 # Query package changes
 rpm -q --changelog bash
+
+# Query package for binaries
+rpm -ql procps-ng | grep '^/usr/bin/'
 ```
 
 Inspecing a package
