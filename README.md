@@ -938,6 +938,21 @@ Once completed, verify the Grub configuration at `/etc/default/grub.conf`. There
 
 > Note: In order to add support for Hyper-V host, in step 3, you need to include some more [flags](https://dietrichschroff.blogspot.com/2013/03/hyper-v-compile-linux-kernel-with.html).
 
+### Removal
+
+In order to remove a custom compiled kernel you need to remove `vmlinuz`, `initrd`, `System.map` and `config` from `/boot` folder. Also remove the modules.
+
+```bash
+sudo rm /boot/*6.1.0
+sudo rm -rf /lib/modules/6.1.0
+```
+
+Finally, don't forget to update the grub configuration.
+
+```bash
+sudo update-grub
+```
+
 
 ## Bootloader
 
