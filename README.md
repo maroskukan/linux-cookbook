@@ -961,7 +961,7 @@ sudo update-grub
 > Note: If you need to invoke Grub menu just one time, use the `shift` key during boot process.
 
 
-## Power settings
+## Power
 
 ### Gnome 43 specifics
 
@@ -985,6 +985,48 @@ You can choose from following values:
 - `ignore` - do nothing
 - `poweroff` - shutdown
 - `hibernate` - hibernate
+
+
+## Firmware
+
+In order to manage firmware updates through OS your device needs to support Linux Vendor Firmware Service (LVFS). This can be confirmed in devices BIOS settings or via device datasheet.
+
+
+First, install the `fwupd` package. 
+
+```bash
+sudo apt install -y fwupd
+```
+
+Next, enable and start `fwupd` service.
+
+```bash
+sudo systemctl enable --now fwupd
+```
+
+Optionally, display supported devices.
+
+```bash
+fwupmgr get-devices
+```
+
+Download latest metadata from LVFS.
+
+```bash
+fwupmgr refresh
+```
+
+Check for available firmware updates.
+
+```bash
+fwupdmgr get-updates
+```
+
+Update the device firmware.
+
+```bash
+fwupdmgr update
+```
 
 
 ## Device Drivers
