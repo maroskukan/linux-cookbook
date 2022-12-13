@@ -934,9 +934,57 @@ The process for compiling a kernel is as follows:
 
 > Note: I recommend to follow above steps with root prileges, for example using interactive session with `sudo -i`
 
-Once completed, verify the Grub configuration at `/etc/grub.conf`. There should be new entry corresponding to new kernel which you can select in boot menu. When happy copy it to `/boot/grub/grub.cfg` to ensure it is picked up on next boot.
+Once completed, verify the Grub configuration at `/etc/default/grub.conf`. There should be new entry corresponding to new kernel which you can select in boot menu. When happy copy it to `/boot/grub/grub.cfg` to ensure it is picked up on next boot.
 
 > Note: In order to add support for Hyper-V host, in step 3, you need to include some more [flags](https://dietrichschroff.blogspot.com/2013/03/hyper-v-compile-linux-kernel-with.html).
+
+
+## Bootloader
+
+### Menu Style and Timeout
+
+Grub2 configuration file is located at `/etc/default/grub.conf`. This is where you can change the default timeout and menu style. For example to add 10 second time out and display menu change the following lines.
+
+Change the timeout style from `hidden` to `menu` and add a `10` second timeout.
+
+```bash
+sudo sed -i 's/GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' /etc/default/grub
+sudo sed -i 's/GRUB_TIMEOUT=.*/GRUB_TIMEOUT=10/' /etc/default/grub
+```
+
+Afterwards you need to apply the changes with `sudo update-grub`.
+
+```bash
+sudo update-grub
+```
+
+> Note: If you need to invoke Grub menu just one time, use the `shift` key during boot process.
+
+
+## Power settings
+
+### Gnome 43 specifics
+
+When using `Gnome 43` you can disable the 60 second Poweroff timer by changing the following setting:
+
+```bash
+gsettings set org.gnome.SessionManager logout-prompt false
+```
+
+### Lid action
+
+This applies to laptops. In order to change the default action when lid is closed you need to edit the `/etc/systemd/logind.conf` file.
+
+```bash
+HandleLidSwitch=poweroff
+HandleLidSwitchEsternalPower=suspend
+```
+
+You can choose from following values:
+- `lock` - lock when lid closed
+- `ignore` - do nothing
+- `poweroff` - shutdown
+- `hibernate` - hibernate
 
 
 ## Device Drivers
