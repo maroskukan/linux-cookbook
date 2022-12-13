@@ -1044,6 +1044,17 @@ fwupdmgr update
 ```
 
 
+## UEFI BIOS
+
+### SecureBoot
+
+In order to verify from OS if SecureBoot is enabled use the following command:
+
+```bash
+mokutil --sb-state
+```
+
+
 ## Device Drivers
 
 Device drivers often referred to as modules are loaded as required into the running kernel. The currently loaded modules can be seen using `lsmod` command wich uses `/proc/modules` as backend. The `modprobe -l` lists all available modules.
