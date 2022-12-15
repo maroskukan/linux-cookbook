@@ -1046,6 +1046,15 @@ fwupdmgr update
 
 ## UEFI BIOS
 
+### Verify 
+
+In order to verify if the system booted into EUFI mode you can check the presence of `/sys/firmware/efi`.
+
+```bash
+[ -d /sys/firmware/efi ] && echo "Installed in UEFI mode" || echo "Installed in Legacy mode"
+```
+
+
 ### SecureBoot
 
 In order to verify from OS if SecureBoot is enabled use the following command:
