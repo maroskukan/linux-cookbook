@@ -1,0 +1,52 @@
+# -*- mode: ruby -*-end
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Hyper-V Provider Specific Configuration
+  config.vm.provider "hyperv" do |h|
+    h.enable_virtualization_extensions = true
+    h.linked_clone = true
+    h.memory = 2048
+    h.maxmemory = 2048
+  end
+
+  # Virtualbox Provider Specific Configuration
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 2048
+    v.cpus = 2
+  end
+
+  # VMware Workstation Provider Specific Configuration
+  config.vm.provider "vmware_desktop" do |v|
+    v.vmx["memsize"] = 2048
+    v.vmx["numvcpus"] = 2
+  end
+
+  config.vm.define "rhel9" do |rhel9|
+    # VM Shared Configuration
+    rhel9.vm.box = "generic/rhel9"
+    rhel9.vm.hostname = "rhel9"
+
+    # Hyper-V VM Specific Configuration
+    rhel9.vm.provider 'hyperv' do |h, override|
+      override.vm.synced_folder ".", "/vagrant", type: "rsync"
+      override.vm.network "public_network", bridge: "Default Switch"
+    end
+
+    # Virtualbox VM Specific Configuration
+    rhel9.vm.provider 'virtualbox' do |v, override|
+      override.vm.synced_folder ".", "/vagrant"
+    end
+
+    # VMware Workstation VM Specific Configuration
+    rhel9.vm.provider 'vmware_desktop' do |v, override|
+      override.vm.synced_folder ".", "/vagrant"
+    end
+  end
+
+  # VM Shared Provisioning Placeholder
+  # config.vm.provision "shell", path: "provision.sh"
+  # config.vm.provision "ansible_local" do |ansible|
+  #   ansible.playbook = "playbook.yml"
+  # end
+end
