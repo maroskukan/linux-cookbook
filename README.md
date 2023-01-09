@@ -26,6 +26,8 @@
     - [Package managers](#package-managers)
       - [RPM](#rpm)
       - [DNF](#dnf)
+    - [Installation tools](#installation-tools)
+      - [Dpkg](#dpkg)
   - [Kernel](#kernel)
     - [Runtime management](#runtime-management)
     - [Documentation](#documentation)
@@ -35,6 +37,16 @@
       - [Initramfs](#initramfs)
     - [Development packages](#development-packages)
     - [Compilation](#compilation)
+    - [Removal](#removal)
+  - [Bootloader](#bootloader)
+    - [Menu Style and Timeout](#menu-style-and-timeout)
+  - [Power](#power)
+    - [Gnome 43 specifics](#gnome-43-specifics)
+    - [Lid action](#lid-action)
+  - [Firmware](#firmware)
+  - [UEFI BIOS](#uefi-bios)
+    - [Verify](#verify)
+    - [SecureBoot](#secureboot)
   - [Device Drivers](#device-drivers)
     - [Kernel Installation](#kernel-installation)
   - [Tips](#tips)
@@ -784,6 +796,20 @@ dnf reinstall tree
 
 # Upgrade package
 dnf upgrade firewalld
+```
+
+
+### Installation tools
+
+#### Dpkg
+
+The package manager for Debian is called `dpkg`. It is a low level tool used for managing lifecycle of `.deb` packages.
+
+Query for binary packages.
+
+```bash
+# List installed packages
+dpkg-query -f '${binary:Package}\n' -W
 ```
 
 
