@@ -1140,6 +1140,79 @@ To change the options for specific entry:
 grubby --remove-args="rhgb quiet" --update-kernel /boot/vmlinuz-3.10.0-1160.76.1.el7.x86_64
 ```
 
+## Access Control
+
+### File Permissions
+
+There are six permissions available, out of which three are regular (read,write,execute) and other three are special (sticky bit, SetGID bit, SetUID bit)
+
+#### Special permissions
+
+`Sticky bit` applies to directories only. When set, only the owning user can delete a file from a directory. It is identifed in permission for `others` therefore to set this bit use the `chmod o+t <direrctory>` or `chmod 1NNN <directory>` where `N` sets the regular permissions.
+
+For example to find all directories with sticky bit set, use the following filter with find.
+
+```bash
+find / -perm /o+t 2>/dev/null
+/dev/mqueue
+/dev/shm
+/sys/fs/bpf
+/tmp
+/tmp/.X11-unix
+/tmp/.ICE-unix
+/tmp/.XIM-unix
+/tmp/.font-unix
+/var/tmp
+```
+
+`SetGID bit` applies to directories and files. When set, the owning group of a newly created file is derived fro the directory that the file is created in (for directories). Executable files run with permission of the owning group of the executable (for files). To set this bit use `chmod g+s <directory | file>` or `chmod 2NNN <directory | file>` where `N` sets the regular permissions. It is then identified in permission for `owning group`.
+
+For example to find all directories with SetGID bit set, use the following filter with find.
+
+```bash
+find / -perm /g+s 2>/dev/null
+/run/tpm2-tss/eventlog
+/run/log/journal
+/run/log/journal/3daaeb8406f245d7952ae590d1d88c36
+/run/log/journal/b49add15b13048b28c526bdd37a5b91d
+/var/lib/tpm2-tss/system/keystore
+/usr/bin/write
+/usr/bin/locate
+/usr/libexec/utempter/utempter
+/usr/libexec/openssh/ssh-keysign
+```
+
+`SetUID bit` applies to files only. When set, the executables run with permissions of the owning user of the executable. To set this bit use the `chmod u+s <file>` or `chmod 4NNN <file>` where `N` sets the regular permissions. It is then identified in permission for `owning user`.
+
+For example to find all files with SetUID bit set, use the following filter with find.
+
+```bash
+find / -perm /u+s 2>/dev/null
+/usr/bin/chage
+/usr/bin/gpasswd
+/usr/bin/newgrp
+/usr/bin/su
+/usr/bin/mount
+/usr/bin/umount
+/usr/bin/crontab
+/usr/bin/passwd
+/usr/bin/sudo
+/usr/bin/pkexec
+/usr/sbin/unix_chkpwd
+/usr/sbin/pam_timestamp_check
+/usr/sbin/userhelper
+/usr/sbin/grub2-set-bootflag
+/usr/lib/polkit-1/polkit-agent-helper-1
+```
+
+#### Default permissions
+
+The the default permissions on vanilla linux based system is `777` for directories and `666` for newly created files resulting in quite open permission model for all users.
+
+In order to manage this behavior you can use `umask <value>` command on time or place it in your login script. The value meaning is how much we are going to subtrack from the default permissions. This applies for both directories and files alike. The common default value is `0022`.
+
+For example `umask 0077` results in folder permission of `700` and file permission of `600` as no negative values are allowed. This makes folders and files more private.
+
 
 ## Tips
 
