@@ -277,13 +277,17 @@ isig icanon iexten echo echoe echok -echonl -noflsh -xcase -tostop -echoprt echo
 
 ## Networking
 
+### Configuration
+
 To update system name:
 
 ```bash
 hostnamectl set-hostname linux.example.com
 ```
 
-To update network settings
+To update runtime settings you can use the `ip` command.
+
+To update persistent network settings you can use `nmtui` or `nmcli`.
 
 ```bash
 # Menu based settings
@@ -299,6 +303,52 @@ nmcli con up ens192
 # Configuration file
 vi /etc/sysconfig/network-scripts/ifcfg-ens192
 ```
+
+
+### Monitoring
+
+Some traditional tools for monitoring and troubleshooting network activity include `ip`,  `ping`, `tracepath`, `ss` and `nmap`. Some newer tools like `mtr`.
+
+```bash
+# Display all available network interfaces
+ip link show
+```
+
+```bash
+# Display device address information
+ip addr show eth0
+```
+
+```bash
+# Display device statistics
+ip -s link show eth0
+```
+
+```bash
+# Check reachability
+ping -c3 1.1.1.1
+```
+
+```bash
+# Display routing table
+ip route
+```
+
+```bash
+# Trace network traffic
+tracepath github.com
+```
+
+```bash
+# Display socket statistics
+ss -plunt
+```
+
+```bash
+# Can localhost for open ports
+nmap -sS localhost
+```
+
 
 ## Date and Time
 
@@ -1209,7 +1259,7 @@ find / -perm /u+s 2>/dev/null
 
 The the default permissions on vanilla linux based system is `777` for directories and `666` for newly created files resulting in quite open permission model for all users.
 
-In order to manage this behavior you can use `umask <value>` command on time or place it in your login script. The value meaning is how much we are going to subtrack from the default permissions. This applies for both directories and files alike. The common default value is `0022`.
+In order to manage this behavior you can use `umask <value>` command on time or place it in your login script. The value meaning is how much we are going to subtrack from the default permissions. This applies for both directories and files alike. The common default value is `0022` and is defined in global login script `/etc/bashrc`.
 
 For example `umask 0077` results in folder permission of `700` and file permission of `600` as no negative values are allowed. This makes folders and files more private.
 
