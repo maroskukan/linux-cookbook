@@ -640,6 +640,17 @@ updatedb
 localte image
 ```
 
+#### Whereis
+
+The `whereis` command locates the binary, source and manual files for a given command.
+
+For example, to find the location of the binary, manual page, and source code for the `lsblk` command, you would run the command:
+
+```bash
+whereis lsblk
+```
+
+
 ### Archiving and Compressing
 
 ```bash
