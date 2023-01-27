@@ -317,6 +317,9 @@ ip link show
 ```bash
 # Display device address information
 ip addr show eth0
+
+# Display device summary
+ip -br addr show eth0
 ```
 
 ```bash
@@ -347,6 +350,11 @@ ss -plunt
 ```bash
 # Can localhost for open ports
 nmap -sS localhost
+```
+
+```bash
+# Path report with statistics
+mtr --report -c 10 example.com
 ```
 
 
@@ -688,7 +696,7 @@ rpm -qd yum
 # Query a list of configuration file paths for package
 rpm -qc yum
 
-# Query file to determine the source package
+# Query database for file to determine the source package
 rpm -qf /bin/bash
 
 # Query for features that a package provides
@@ -704,7 +712,7 @@ rpm -q --changelog bash
 rpm -ql procps-ng | grep '^/usr/bin/'
 ```
 
-Inspecing a package
+Inspcting a package
 
 ```bash
 # Download packaged and dependencies
@@ -714,6 +722,44 @@ dnf download httpd --resolve
 rpm -qip httpd-*
 rpm -qlp httpd-*
 ```
+
+Downloading and extracting a package
+
+```bash
+# Download a package
+yumdownloader nmap
+
+file nmap-7.91-10.el9.x86_64.rpm
+nmap-7.91-10.el9.x86_64.rpm: RPM v3.0 bin i386/x86_64 nmap-3:7.91-10.el9
+
+# Extract package
+rpm2cpio nmap-7.91-10.el9.x86_64.rpm | cpio -duim
+
+# Inspect package
+ls
+nmap-7.91-10.el9.x86_64.rpm  usr
+
+tree -F usr | head
+usr
+├── bin/
+│   ├── nmap*
+│   └── nping*
+├── lib/
+└── share/
+    ├── doc/
+    │   └── nmap/
+    │       ├── nmap.usage.txt
+    │       └── README
+
+# Query local file
+rpm -qpl nmap-7.91-10.el9.x86_64.rpm | head -5
+/usr/bin/nmap
+/usr/bin/nping
+/usr/lib/.build-id
+/usr/lib/.build-id/9b
+/usr/lib/.build-id/9b/d6db681c980c017fbe25daeb051a7ba4049386
+```
+
 
 #### DNF
 
