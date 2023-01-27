@@ -593,7 +593,9 @@ awk -F: '/^root/{ print $1 " is using " $7}' /etc/passwd
 
 ### Searching
 
-Find utility is great for locating files and folders based on text patterns.
+#### Find
+
+The `find` utility is great for locating files and folders based on text patterns in real time.
 
 Below are some examples:
 
@@ -614,14 +616,29 @@ find -name '*.pdf' -delete
 find /etc -maxdepth 1 -type l
 
 # Find all files with size larger then 10M and print their size
-find /boot -size +10000k -type f -exec du -h {} \;
+find /boot -size +10M -type f -exec du -h {} \;
 
 # Find all files that belong to user which does not exist
 # add -delete to also cleanup these files
 find /home /var -nouser
+
+# Find all files that were changed 60 minutes ago
+find / -mmin 60
 ```
 
+#### Locate
 
+An alternative to `find` is the `locate` utility. It searches a pre-generated index for file names or paths and therefore quickly returns the result.
+
+Below are some examples:
+
+```bash
+# Trigger database update (otherwise it is updated every day)
+updatedb
+
+# Search for partial match
+localte image
+```
 
 ### Archiving and Compressing
 
