@@ -410,24 +410,31 @@ mkfs.ext4 /dev/sdb1
 
 ### Mountpoints
 
-To mount an existing filesystem.
+To mount an existing filesystem using device name or more preferably using device UUID.
 
 ```bash
-mount /dev/sdb1 /data
+# Create mountpoint
+mkdir /mnt/data
+
+# Mount fs using device Name
+mount /dev/sdb1 /mnt/data
+
+# Mount fs using device UUID
+mount UUID=$(lsblk -no uuid /dev/sda1) /mnt/data
 ```
 
 To umnount a filesystem.
 
 ```bash
-umount /data
+umount /mnt/data
 ```
 
 When you receive an error `target is busy` you can identify which processes are using the data on mountpoint using `lsof` or `fuser -m`.
 
 ```bash
-lsof /data
+lsof /mnt/data
 
-fuser -m /data
+fuser -m /mnt/data
 ```
 
 ## Date and Time
