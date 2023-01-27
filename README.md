@@ -360,10 +360,12 @@ mtr --report -c 10 example.com
 
 ## Storage
 
+### Block Devices
+
 List block davices from `/dev`
 
 ```bash
-ls -l /dev/sda*
+find /dev -type b
 ```
 
 List available block devices including their filesystem type.
@@ -396,6 +398,37 @@ Summary of mountpoints and their respective options.
 findmnt -s
 ```
 
+
+### Filesystem
+
+Create `ext4` filesystem on first partition of second sata block device.
+
+```bash
+mkfs.ext4 /dev/sdb1
+```
+
+
+### Mountpoints
+
+To mount an existing filesystem.
+
+```bash
+mount /dev/sdb1 /data
+```
+
+To umnount a filesystem.
+
+```bash
+umount /data
+```
+
+When you receive an error `target is busy` you can identify which processes are using the data on mountpoint using `lsof` or `fuser -m`.
+
+```bash
+lsof /data
+
+fuser -m /data
+```
 
 ## Date and Time
 
