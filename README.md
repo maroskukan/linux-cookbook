@@ -358,6 +358,45 @@ mtr --report -c 10 example.com
 ```
 
 
+## Storage
+
+List block davices from `/dev`
+
+```bash
+ls -l /dev/sda*
+```
+
+List available block devices including their filesystem type.
+
+```bash
+lsblk --fs
+```
+
+List block device attributes.
+
+```bash
+blkid /dev/sda1
+```
+
+Display data utilization on root mountpoint.
+
+```bash
+df -h /
+```
+
+Display data utilization for a specific directory.
+
+```bash
+du -sh /usr
+```
+
+Summary of mountpoints and their respective options.
+
+```bash
+findmnt -s
+```
+
+
 ## Date and Time
 
 ```bash
