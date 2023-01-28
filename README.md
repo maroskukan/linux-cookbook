@@ -1551,6 +1551,17 @@ lrwxrwxrwx.   1 root root   90 Jan 28 06:15 vgdisplay -> sos_commands/lvm2/vgdis
 ```
 
 
+## Insights
+
+Red Hat Insights is a proactive systems management tool that helps identify and prevent potential issues before they can cause problems on Red Hat Enterprise Linux systems. It uses machine learning and automated remediation to detect and fix problems related to security, performance, and stability. It also provides real-time reporting and analytics to help administrators quickly identify and resolve issues, and can be integrated with other management tools for a more complete view of the IT environment.
+
+```bash
+insights-client --register
+```
+
+Red Hat Insights uses the Ansible Automation Platform to remediate configuration drift on systems it manages. It uses Ansible playbooks to automatically apply the necessary changes to bring the system back into compliance with recommended best practices and policies.
+
+
 ## Tips
 
 ### SSH Session Hangout
