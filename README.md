@@ -595,7 +595,13 @@ awk -F: '/^root/{ print $1 " is using " $7}' /etc/passwd
 
 #### Find
 
-The `find` utility is great for locating files and folders based on text patterns in real time.
+Find is an utility that searches for files and directories in a file system based on certain criteria, such as name, size, type, and more. It can also perform actions on the matched files and directories, such as deleting, moving, or executing commands. It is commonly used for searching for files and directories in a specific location, and can be combined with other commands to perform advanced tasks.
+
+```bash
+find <path> <tests> <actions>
+```
+
+The `path` defaults to current working directory, `tests` can include properties such as name, size, depth, ownership, access time. Finally the `actions` which defaults to print can include delete, exec, ok.
 
 Below are some examples:
 
@@ -618,17 +624,34 @@ find /etc -maxdepth 1 -type l
 # Find all files with size larger then 10M and print their size
 find /boot -size +10M -type f -exec du -h {} \;
 
+# Find all files with size larger than 100M and list their attributes
+find /usr -size +100 -exec ls -lh {} \;
+
 # Find all files that belong to user which does not exist
 # add -delete to also cleanup these files
 find /home /var -nouser
 
+# Find all files that belong to user who has atleast write permission
+find /var -type f -user vagrant -perm /u=w
+
 # Find all files that were changed 60 minutes ago
 find / -mmin 60
+
+# Find files (hardlinks) with same inode as "target" file and delete them interactively
+find / -inum $(stat -c %i target) -exec rm -i {} \;
 ```
+
+You can also leverage a pipe to redirect standard output to `xargs`, which then allows you to pass standard input as an argument for next command.
+
+```bash
+# Find files (softlinks) that point to "target" file and perform a long listing
+find / -lname target 2>/dev/null | xargs ls -l
+```
+
 
 #### Locate
 
-An alternative to `find` is the `locate` utility. It searches a pre-generated index for file names or paths and therefore quickly returns the result.
+Locate is a program that quickly finds files and directories on a Unix-based system by searching a prebuilt database of file names. It is faster than a regular search using find and does not require real-time scanning of the file system. It is useful for quickly finding files or directories, but it may not find recently added or modified files.
 
 Below are some examples:
 
@@ -637,7 +660,7 @@ Below are some examples:
 updatedb
 
 # Search for partial match
-localte image
+locate image
 ```
 
 #### Whereis
