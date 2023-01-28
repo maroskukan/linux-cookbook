@@ -1498,6 +1498,59 @@ cockpit-system.noarch : Cockpit admin interface package for configuring and trou
 cockpit-ws.x86_64 : Cockpit Web Service
 ```
 
+
+## Reporting
+
+### SoS
+
+Sos is a tool for collecting system logs and other debug information which can be used when interacting with upstream support teams.
+
+```bash
+# Generate a report
+sos report
+
+# Extract the generated archive
+mkdir /root/sosreport
+tar xf /var/tmp/sosreport-rhel9-2023-01-28-pdzhygi.tar.xz -C /root/sosreport
+
+# List the content
+ls -l /root/sosreport/sosreport-rhel9-2023-01-28-pdzhygi/
+total 24
+dr-xr-xr-x.   4 root root   33 Jan 27 07:50 boot
+lrwxrwxrwx.   1 root root   32 Jan 28 06:15 date -> sos_commands/systemd/timedatectl
+lrwxrwxrwx.   1 root root   37 Jan 28 06:15 df -> sos_commands/filesys/df_-al_-x_autofs
+lrwxrwxrwx.   1 root root   31 Jan 28 06:15 dmidecode -> sos_commands/hardware/dmidecode
+-rw-r--r--.   1 root root   85 Jan 28 06:17 environment
+drwxr-xr-x.  45 root root 4096 Jan 28 05:38 etc
+lrwxrwxrwx.   1 root root   24 Jan 28 06:15 free -> sos_commands/memory/free
+lrwxrwxrwx.   1 root root   26 Jan 28 06:15 hostname -> sos_commands/host/hostname
+lrwxrwxrwx.   1 root root   80 Jan 28 06:15 installed-rpms -> sos_commands/rpm/sh_-c_rpm_--nodigest_-qa_--qf_-59_NVRA_INSTALLTIME_date_sort_-V
+lrwxrwxrwx.   1 root root   34 Jan 28 06:15 ip_addr -> sos_commands/networking/ip_-o_addr
+lrwxrwxrwx.   1 root root   23 Jan 28 06:15 last -> sos_commands/login/last
+lrwxrwxrwx.   1 root root    7 Jan 27 12:59 lib -> usr/lib
+lrwxrwxrwx.   1 root root   25 Jan 28 06:15 lsmod -> sos_commands/kernel/lsmod
+lrwxrwxrwx.   1 root root   36 Jan 28 06:15 lsof -> sos_commands/process/lsof_M_-n_-l_-c
+lrwxrwxrwx.   1 root root   28 Jan 28 06:15 lspci -> sos_commands/pci/lspci_-nnvv
+lrwxrwxrwx.   1 root root   29 Jan 28 06:15 mount -> sos_commands/filesys/mount_-l
+lrwxrwxrwx.   1 root root   41 Jan 28 06:15 netstat -> sos_commands/networking/netstat_-W_-neopa
+dr-xr-xr-x. 141 root root 4096 Jan 26 02:12 proc
+lrwxrwxrwx.   1 root root   31 Jan 28 06:15 ps -> sos_commands/process/ps_auxwwwm
+lrwxrwxrwx.   1 root root   31 Jan 28 06:15 pstree -> sos_commands/process/pstree_-lp
+lrwxrwxrwx.   1 root root   32 Jan 28 06:15 route -> sos_commands/networking/route_-n
+drwxr-xr-x.   5 root root   52 Jan 28 06:15 run
+drwxr-xr-x.  64 root root 4096 Jan 28 06:16 sos_commands
+drwxr-xr-x.   2 root root   35 Jan 28 06:17 sos_logs
+drwxr-xr-x.   2 root root   74 Jan 28 06:17 sos_reports
+dr-xr-xr-x.  10 root root  112 Jan 26 02:12 sys
+lrwxrwxrwx.   1 root root   28 Jan 28 06:15 uname -> sos_commands/kernel/uname_-a
+lrwxrwxrwx.   1 root root   24 Jan 28 06:15 uptime -> sos_commands/host/uptime
+drwxr-xr-x.   4 root root   30 Nov 29 02:58 usr
+drwxr-xr-x.   5 root root   41 Jan 28 05:01 var
+-rw-r--r--.   1 root root   14 Jan 28 06:17 version.txt
+lrwxrwxrwx.   1 root root   90 Jan 28 06:15 vgdisplay -> sos_commands/lvm2/vgdisplay_-vv_--config_global_metadata_read_only_1_--nolocking_--foreign
+```
+
+
 ## Tips
 
 ### SSH Session Hangout
