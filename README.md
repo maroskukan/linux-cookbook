@@ -360,9 +360,9 @@ mtr --report -c 10 example.com
 
 ## Storage
 
-### Block Devices
+Storage devices are used to store data, such as SSD or USB drives. They can be partitioned and formatted to different file systems, such as ext4, exfat, or others, and can be mounted to the file system for easy access. They can be managed using utilities such as fdisk, parted, and mount.
 
-List block davices from `/dev`
+In order to list available block devices, you can use `find` or leverage a more specialied command sych as `lsblk` which will display more details.
 
 ```bash
 find /dev -type b
@@ -436,6 +436,9 @@ lsof /mnt/data
 
 fuser -m /mnt/data
 ```
+
+> **Note**: When you are using graphical environment, it is common to mount removable media in the `/run/media` directory.
+
 
 ## Date and Time
 
