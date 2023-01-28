@@ -1443,6 +1443,61 @@ In order to manage this behavior you can use `umask <value>` command on time or 
 For example `umask 0077` results in folder permission of `700` and file permission of `600` as no negative values are allowed. This makes folders and files more private.
 
 
+## Management
+
+### Secure Shell
+
+Secure Shell (SSH) is a protocol for securely connecting to remote devices. It provides a way to access a command line interface on a remote machine, allowing users to run commands, transfer files, and manage network services. SSH uses encryption to secure the connection and authentication to verify the identity of the user. It is commonly used for remote administration and automation tasks in Linux and other Unix-like operating systems.
+
+
+### Cockpit
+
+Cockpit is a web-based interface for managing and monitoring Linux servers. It provides a simple, user-friendly interface for system administrators to perform common tasks such as managing services, monitoring system logs, and configuring network settings. It can also be used to manage multiple servers at once, making it a useful tool for managing large deployments. Cockpit is designed to be lightweight and easy to use, and is typically included in most modern Linux distributions
+
+```bash
+# Install the package
+dnf install -y cockpit
+
+# Enable the socket
+systemctl enable --now cockpit.socket
+
+# Display the default ListenStream port (TCP/9090)
+grep -i listen /usr/lib/systemd/system/cockpit.socket
+```
+
+Optionally verify that firewall allows this communication.
+
+```bash
+# The service list should include 'cockpit`
+firewall-cmd --list-all | grep services
+```
+
+In case it is not listed, you need to add this service and reload the configuration.
+
+```bash
+firewall-cmd --add-service cockpit --permanent
+firewall-cmd --reload
+```
+
+The cockpit functionaly can be extended through the use of plugins. In order to get a taste what kind of plugins are available you can use the dnf `search` argument.
+
+```bash
+dnf search cockpit-* 2>/dev/null | grep ^cockpit
+cockpit-bridge.x86_64 : Cockpit bridge server-side component
+cockpit-composer.noarch : Composer GUI for use with Cockpit
+cockpit-doc.noarch : Cockpit deployment and developer guide
+cockpit-file-sharing.noarch : Cockpit user interface for managing SMB and NFS file sharing.
+cockpit-machines.noarch : Cockpit user interface for virtual machines
+cockpit-navigator.noarch : A File System Browser for Cockpit
+cockpit-packagekit.noarch : Cockpit user interface for packages
+cockpit-pcp.x86_64 : Cockpit PCP integration
+cockpit-podman.noarch : Cockpit component for Podman containers
+cockpit-session-recording.noarch : Cockpit Session Recording
+cockpit-storaged.noarch : Cockpit user interface for storage, using udisks
+cockpit-system.noarch : Cockpit admin interface package for configuring and troubleshooting a system
+cockpit-ws.x86_64 : Cockpit Web Service
+```
+
 ## Tips
 
 ### SSH Session Hangout
