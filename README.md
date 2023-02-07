@@ -6,6 +6,7 @@
     - [Password Recovery](#password-recovery)
       - [Option A](#option-a)
       - [Option B](#option-b)
+      - [Option C](#option-c)
     - [Default Kernel](#default-kernel)
     - [Default Target](#default-target)
   - [Service Control](#service-control)
@@ -77,21 +78,55 @@ mount -o remount,rw /sysroot
 chroot /sysroot
 
 # Update root password
-passwd
+echo LinuxRocks | passwd --stdin root
 
 # Finally SElinux needs to update files on next reboot
 touch /.autorelabel
 
-# Exit chroot shell
+# Exit chroot environment
 exit
 
-# exit password recovery
+# Exit initramfs environment
 exit
 ```
 
-Once the `selinux-autorelabel` is completed the machine is restarted and you can log in using newly set password.
+Once the `selinux-autorelabel` is completed the machine is restarted and you can log in using newly set password. One of the drawbacks if this approach is that relabeling can take significant amount of time.
+
 
 #### Option B
+
+In order to stop the boot process at `initramfs`. Press `e` at the main grub entry and append `rd.break` to kernel line (contains `vmlinuz` keyword). Press `Ctrl-x` to finish booting. Press `Ctrl-X` to boot. After boot System automatically mounts the existing root file system in read only mode at `/sysroot`. You need to remount using read write mode. Afterwards, change the root file system path and update the root password.
+
+```bash
+# Verify existing mount settings
+mount | grep sysroot
+/dev/mapper/rhel-root on /sysroot type dxfs (ro,relatime,attr2,inode64,logbufs=8,logbsize=32k,noquota)
+
+# Mount sysroot using read write mode
+mount -o remount,rw /sysroot
+
+# Change root file system to /sysroot
+chroot /sysroot
+
+# Update root password
+echo LinuxRocks | passwd --stdin root
+
+# Load SELinux Policy
+load_policy -i
+
+# Restore context for /etc/shadow
+restorecon -FvR /etc/shadow
+
+# Exit chroot environment
+exit
+
+# Exit initramfs environment
+exit
+```
+This method is quicker as we only relabel to file that was changed.
+
+
+#### Option C
 
 Once again, you need to stop the boot process at `initramfs`. Press `e` at the main grub entry and append `rd.break` and `enforcing=0` to the line containing `vmlinuz` keyword. Press `Ctrl+x` to continue the boot process.
 
@@ -105,7 +140,7 @@ mount -o remount,rw /sysroot
 chroot /sysroot
 
 # Update root password and exit chroot
-passwd ; exit
+echo LinuxRocks | passwd --stdin root ; exit
 
 # Mount sysroot using read-only mode and exit
 mount -o remount,ro /sysroot ; exit
@@ -277,17 +312,13 @@ isig icanon iexten echo echoe echok -echonl -noflsh -xcase -tostop -echoprt echo
 
 ## Networking
 
-### Configuration
-
 To update system name:
 
 ```bash
 hostnamectl set-hostname linux.example.com
 ```
 
-To update runtime settings you can use the `ip` command.
-
-To update persistent network settings you can use `nmtui` or `nmcli`.
+To update network settings
 
 ```bash
 # Menu based settings
@@ -303,142 +334,6 @@ nmcli con up ens192
 # Configuration file
 vi /etc/sysconfig/network-scripts/ifcfg-ens192
 ```
-
-
-### Monitoring
-
-Some traditional tools for monitoring and troubleshooting network activity include `ip`,  `ping`, `tracepath`, `ss` and `nmap`. Some newer tools like `mtr`.
-
-```bash
-# Display all available network interfaces
-ip link show
-```
-
-```bash
-# Display device address information
-ip addr show eth0
-
-# Display device summary
-ip -br addr show eth0
-```
-
-```bash
-# Display device statistics
-ip -s link show eth0
-```
-
-```bash
-# Check reachability
-ping -c3 1.1.1.1
-```
-
-```bash
-# Display routing table
-ip route
-```
-
-```bash
-# Trace network traffic
-tracepath github.com
-```
-
-```bash
-# Display socket statistics
-ss -plunt
-```
-
-```bash
-# Can localhost for open ports
-nmap -sS localhost
-```
-
-```bash
-# Path report with statistics
-mtr --report -c 10 example.com
-```
-
-
-## Storage
-
-Storage devices are used to store data, such as SSD or USB drives. They can be partitioned and formatted to different file systems, such as ext4, exfat, or others, and can be mounted to the file system for easy access. They can be managed using utilities such as fdisk, parted, and mount.
-
-In order to list available block devices, you can use `find` or leverage a more specialied command sych as `lsblk` which will display more details.
-
-```bash
-find /dev -type b
-```
-
-List available block devices including their filesystem type.
-
-```bash
-lsblk --fs
-```
-
-List block device attributes.
-
-```bash
-blkid /dev/sda1
-```
-
-Display data utilization on root mountpoint.
-
-```bash
-df -h /
-```
-
-Display data utilization for a specific directory.
-
-```bash
-du -sh /usr
-```
-
-Summary of mountpoints and their respective options.
-
-```bash
-findmnt -s
-```
-
-
-### Filesystem
-
-Create `ext4` filesystem on first partition of second sata block device.
-
-```bash
-mkfs.ext4 /dev/sdb1
-```
-
-
-### Mountpoints
-
-To mount an existing filesystem using device name or more preferably using device UUID.
-
-```bash
-# Create mountpoint
-mkdir /mnt/data
-
-# Mount fs using device Name
-mount /dev/sdb1 /mnt/data
-
-# Mount fs using device UUID
-mount UUID=$(lsblk -no uuid /dev/sda1) /mnt/data
-```
-
-To umnount a filesystem.
-
-```bash
-umount /mnt/data
-```
-
-When you receive an error `target is busy` you can identify which processes are using the data on mountpoint using `lsof` or `fuser -m`.
-
-```bash
-lsof /mnt/data
-
-fuser -m /mnt/data
-```
-
-> **Note**: When you are using graphical environment, it is common to mount removable media in the `/run/media` directory.
-
 
 ## Date and Time
 
@@ -596,15 +491,7 @@ awk -F: '/^root/{ print $1 " is using " $7}' /etc/passwd
 
 ### Searching
 
-#### Find
-
-Find is an utility that searches for files and directories in a file system based on certain criteria, such as name, size, type, and more. It can also perform actions on the matched files and directories, such as deleting, moving, or executing commands. It is commonly used for searching for files and directories in a specific location, and can be combined with other commands to perform advanced tasks.
-
-```bash
-find <path> <tests> <actions>
-```
-
-The `path` defaults to current working directory, `tests` can include properties such as name, size, depth, ownership, access time. Finally the `actions` which defaults to print can include delete, exec, ok.
+Find utility is great for locating files and folders based on text patterns.
 
 Below are some examples:
 
@@ -625,56 +512,13 @@ find -name '*.pdf' -delete
 find /etc -maxdepth 1 -type l
 
 # Find all files with size larger then 10M and print their size
-find /boot -size +10M -type f -exec du -h {} \;
-
-# Find all files with size larger than 100M and list their attributes
-find /usr -size +100 -exec ls -lh {} \;
+find /boot -size +10000k -type f -exec du -h {} \;
 
 # Find all files that belong to user which does not exist
 # add -delete to also cleanup these files
 find /home /var -nouser
-
-# Find all files that belong to user who has atleast write permission
-find /var -type f -user vagrant -perm /u=w
-
-# Find all files that were changed 60 minutes ago
-find / -mmin 60
-
-# Find files (hardlinks) with same inode as "target" file and delete them interactively
-find / -inum $(stat -c %i target) -exec rm -i {} \;
 ```
 
-You can also leverage a pipe to redirect standard output to `xargs`, which then allows you to pass standard input as an argument for next command.
-
-```bash
-# Find files (softlinks) that point to "target" file and perform a long listing
-find / -lname target 2>/dev/null | xargs ls -l
-```
-
-
-#### Locate
-
-Locate is a program that quickly finds files and directories on a Unix-based system by searching a prebuilt database of file names. It is faster than a regular search using find and does not require real-time scanning of the file system. It is useful for quickly finding files or directories, but it may not find recently added or modified files.
-
-Below are some examples:
-
-```bash
-# Trigger database update (otherwise it is updated every day)
-updatedb
-
-# Search for partial match
-locate image
-```
-
-#### Whereis
-
-The `whereis` command locates the binary, source and manual files for a given command.
-
-For example, to find the location of the binary, manual page, and source code for the `lsblk` command, you would run the command:
-
-```bash
-whereis lsblk
-```
 
 
 ### Archiving and Compressing
@@ -829,7 +673,7 @@ rpm -qd yum
 # Query a list of configuration file paths for package
 rpm -qc yum
 
-# Query database for file to determine the source package
+# Query file to determine the source package
 rpm -qf /bin/bash
 
 # Query for features that a package provides
@@ -845,7 +689,7 @@ rpm -q --changelog bash
 rpm -ql procps-ng | grep '^/usr/bin/'
 ```
 
-Inspcting a package
+Inspecing a package
 
 ```bash
 # Download packaged and dependencies
@@ -855,44 +699,6 @@ dnf download httpd --resolve
 rpm -qip httpd-*
 rpm -qlp httpd-*
 ```
-
-Downloading and extracting a package
-
-```bash
-# Download a package
-yumdownloader nmap
-
-file nmap-7.91-10.el9.x86_64.rpm
-nmap-7.91-10.el9.x86_64.rpm: RPM v3.0 bin i386/x86_64 nmap-3:7.91-10.el9
-
-# Extract package
-rpm2cpio nmap-7.91-10.el9.x86_64.rpm | cpio -duim
-
-# Inspect package
-ls
-nmap-7.91-10.el9.x86_64.rpm  usr
-
-tree -F usr | head
-usr
-├── bin/
-│   ├── nmap*
-│   └── nping*
-├── lib/
-└── share/
-    ├── doc/
-    │   └── nmap/
-    │       ├── nmap.usage.txt
-    │       └── README
-
-# Query local file
-rpm -qpl nmap-7.91-10.el9.x86_64.rpm | head -5
-/usr/bin/nmap
-/usr/bin/nping
-/usr/lib/.build-id
-/usr/lib/.build-id/9b
-/usr/lib/.build-id/9b/d6db681c980c017fbe25daeb051a7ba4049386
-```
-
 
 #### DNF
 
@@ -1368,198 +1174,6 @@ To change the options for specific entry:
 ```bash
 grubby --remove-args="rhgb quiet" --update-kernel /boot/vmlinuz-3.10.0-1160.76.1.el7.x86_64
 ```
-
-## Access Control
-
-### File Permissions
-
-There are six permissions available, out of which three are regular (read,write,execute) and other three are special (sticky bit, SetGID bit, SetUID bit)
-
-#### Special permissions
-
-`Sticky bit` applies to directories only. When set, only the owning user can delete a file from a directory. It is identifed in permission for `others` therefore to set this bit use the `chmod o+t <direrctory>` or `chmod 1NNN <directory>` where `N` sets the regular permissions.
-
-For example to find all directories with sticky bit set, use the following filter with find.
-
-```bash
-find / -perm /o+t 2>/dev/null
-/dev/mqueue
-/dev/shm
-/sys/fs/bpf
-/tmp
-/tmp/.X11-unix
-/tmp/.ICE-unix
-/tmp/.XIM-unix
-/tmp/.font-unix
-/var/tmp
-```
-
-`SetGID bit` applies to directories and files. When set, the owning group of a newly created file is derived fro the directory that the file is created in (for directories). Executable files run with permission of the owning group of the executable (for files). To set this bit use `chmod g+s <directory | file>` or `chmod 2NNN <directory | file>` where `N` sets the regular permissions. It is then identified in permission for `owning group`.
-
-For example to find all directories with SetGID bit set, use the following filter with find.
-
-```bash
-find / -perm /g+s 2>/dev/null
-/run/tpm2-tss/eventlog
-/run/log/journal
-/run/log/journal/3daaeb8406f245d7952ae590d1d88c36
-/run/log/journal/b49add15b13048b28c526bdd37a5b91d
-/var/lib/tpm2-tss/system/keystore
-/usr/bin/write
-/usr/bin/locate
-/usr/libexec/utempter/utempter
-/usr/libexec/openssh/ssh-keysign
-```
-
-`SetUID bit` applies to files only. When set, the executables run with permissions of the owning user of the executable. To set this bit use the `chmod u+s <file>` or `chmod 4NNN <file>` where `N` sets the regular permissions. It is then identified in permission for `owning user`.
-
-For example to find all files with SetUID bit set, use the following filter with find.
-
-```bash
-find / -perm /u+s 2>/dev/null
-/usr/bin/chage
-/usr/bin/gpasswd
-/usr/bin/newgrp
-/usr/bin/su
-/usr/bin/mount
-/usr/bin/umount
-/usr/bin/crontab
-/usr/bin/passwd
-/usr/bin/sudo
-/usr/bin/pkexec
-/usr/sbin/unix_chkpwd
-/usr/sbin/pam_timestamp_check
-/usr/sbin/userhelper
-/usr/sbin/grub2-set-bootflag
-/usr/lib/polkit-1/polkit-agent-helper-1
-```
-
-#### Default permissions
-
-The the default permissions on vanilla linux based system is `777` for directories and `666` for newly created files resulting in quite open permission model for all users.
-
-In order to manage this behavior you can use `umask <value>` command on time or place it in your login script. The value meaning is how much we are going to subtrack from the default permissions. This applies for both directories and files alike. The common default value is `0022` and is defined in global login script `/etc/bashrc`.
-
-For example `umask 0077` results in folder permission of `700` and file permission of `600` as no negative values are allowed. This makes folders and files more private.
-
-
-## Management
-
-### Secure Shell
-
-Secure Shell (SSH) is a protocol for securely connecting to remote devices. It provides a way to access a command line interface on a remote machine, allowing users to run commands, transfer files, and manage network services. SSH uses encryption to secure the connection and authentication to verify the identity of the user. It is commonly used for remote administration and automation tasks in Linux and other Unix-like operating systems.
-
-
-### Cockpit
-
-Cockpit is a web-based interface for managing and monitoring Linux servers. It provides a simple, user-friendly interface for system administrators to perform common tasks such as managing services, monitoring system logs, and configuring network settings. It can also be used to manage multiple servers at once, making it a useful tool for managing large deployments. Cockpit is designed to be lightweight and easy to use, and is typically included in most modern Linux distributions
-
-```bash
-# Install the package
-dnf install -y cockpit
-
-# Enable the socket
-systemctl enable --now cockpit.socket
-
-# Display the default ListenStream port (TCP/9090)
-grep -i listen /usr/lib/systemd/system/cockpit.socket
-```
-
-Optionally verify that firewall allows this communication.
-
-```bash
-# The service list should include 'cockpit`
-firewall-cmd --list-all | grep services
-```
-
-In case it is not listed, you need to add this service and reload the configuration.
-
-```bash
-firewall-cmd --add-service cockpit --permanent
-firewall-cmd --reload
-```
-
-The cockpit functionaly can be extended through the use of plugins. In order to get a taste what kind of plugins are available you can use the dnf `search` argument.
-
-```bash
-dnf search cockpit-* 2>/dev/null | grep ^cockpit
-cockpit-bridge.x86_64 : Cockpit bridge server-side component
-cockpit-composer.noarch : Composer GUI for use with Cockpit
-cockpit-doc.noarch : Cockpit deployment and developer guide
-cockpit-file-sharing.noarch : Cockpit user interface for managing SMB and NFS file sharing.
-cockpit-machines.noarch : Cockpit user interface for virtual machines
-cockpit-navigator.noarch : A File System Browser for Cockpit
-cockpit-packagekit.noarch : Cockpit user interface for packages
-cockpit-pcp.x86_64 : Cockpit PCP integration
-cockpit-podman.noarch : Cockpit component for Podman containers
-cockpit-session-recording.noarch : Cockpit Session Recording
-cockpit-storaged.noarch : Cockpit user interface for storage, using udisks
-cockpit-system.noarch : Cockpit admin interface package for configuring and troubleshooting a system
-cockpit-ws.x86_64 : Cockpit Web Service
-```
-
-
-## Reporting
-
-### SoS
-
-Sos is a tool for collecting system logs and other debug information which can be used when interacting with upstream support teams.
-
-```bash
-# Generate a report
-sos report
-
-# Extract the generated archive
-mkdir /root/sosreport
-tar xf /var/tmp/sosreport-rhel9-2023-01-28-pdzhygi.tar.xz -C /root/sosreport
-
-# List the content
-ls -l /root/sosreport/sosreport-rhel9-2023-01-28-pdzhygi/
-total 24
-dr-xr-xr-x.   4 root root   33 Jan 27 07:50 boot
-lrwxrwxrwx.   1 root root   32 Jan 28 06:15 date -> sos_commands/systemd/timedatectl
-lrwxrwxrwx.   1 root root   37 Jan 28 06:15 df -> sos_commands/filesys/df_-al_-x_autofs
-lrwxrwxrwx.   1 root root   31 Jan 28 06:15 dmidecode -> sos_commands/hardware/dmidecode
--rw-r--r--.   1 root root   85 Jan 28 06:17 environment
-drwxr-xr-x.  45 root root 4096 Jan 28 05:38 etc
-lrwxrwxrwx.   1 root root   24 Jan 28 06:15 free -> sos_commands/memory/free
-lrwxrwxrwx.   1 root root   26 Jan 28 06:15 hostname -> sos_commands/host/hostname
-lrwxrwxrwx.   1 root root   80 Jan 28 06:15 installed-rpms -> sos_commands/rpm/sh_-c_rpm_--nodigest_-qa_--qf_-59_NVRA_INSTALLTIME_date_sort_-V
-lrwxrwxrwx.   1 root root   34 Jan 28 06:15 ip_addr -> sos_commands/networking/ip_-o_addr
-lrwxrwxrwx.   1 root root   23 Jan 28 06:15 last -> sos_commands/login/last
-lrwxrwxrwx.   1 root root    7 Jan 27 12:59 lib -> usr/lib
-lrwxrwxrwx.   1 root root   25 Jan 28 06:15 lsmod -> sos_commands/kernel/lsmod
-lrwxrwxrwx.   1 root root   36 Jan 28 06:15 lsof -> sos_commands/process/lsof_M_-n_-l_-c
-lrwxrwxrwx.   1 root root   28 Jan 28 06:15 lspci -> sos_commands/pci/lspci_-nnvv
-lrwxrwxrwx.   1 root root   29 Jan 28 06:15 mount -> sos_commands/filesys/mount_-l
-lrwxrwxrwx.   1 root root   41 Jan 28 06:15 netstat -> sos_commands/networking/netstat_-W_-neopa
-dr-xr-xr-x. 141 root root 4096 Jan 26 02:12 proc
-lrwxrwxrwx.   1 root root   31 Jan 28 06:15 ps -> sos_commands/process/ps_auxwwwm
-lrwxrwxrwx.   1 root root   31 Jan 28 06:15 pstree -> sos_commands/process/pstree_-lp
-lrwxrwxrwx.   1 root root   32 Jan 28 06:15 route -> sos_commands/networking/route_-n
-drwxr-xr-x.   5 root root   52 Jan 28 06:15 run
-drwxr-xr-x.  64 root root 4096 Jan 28 06:16 sos_commands
-drwxr-xr-x.   2 root root   35 Jan 28 06:17 sos_logs
-drwxr-xr-x.   2 root root   74 Jan 28 06:17 sos_reports
-dr-xr-xr-x.  10 root root  112 Jan 26 02:12 sys
-lrwxrwxrwx.   1 root root   28 Jan 28 06:15 uname -> sos_commands/kernel/uname_-a
-lrwxrwxrwx.   1 root root   24 Jan 28 06:15 uptime -> sos_commands/host/uptime
-drwxr-xr-x.   4 root root   30 Nov 29 02:58 usr
-drwxr-xr-x.   5 root root   41 Jan 28 05:01 var
--rw-r--r--.   1 root root   14 Jan 28 06:17 version.txt
-lrwxrwxrwx.   1 root root   90 Jan 28 06:15 vgdisplay -> sos_commands/lvm2/vgdisplay_-vv_--config_global_metadata_read_only_1_--nolocking_--foreign
-```
-
-
-## Insights
-
-Red Hat Insights is a proactive systems management tool that helps identify and prevent potential issues before they can cause problems on Red Hat Enterprise Linux systems. It uses machine learning and automated remediation to detect and fix problems related to security, performance, and stability. It also provides real-time reporting and analytics to help administrators quickly identify and resolve issues, and can be integrated with other management tools for a more complete view of the IT environment.
-
-```bash
-insights-client --register
-```
-
-Red Hat Insights uses the Ansible Automation Platform to remediate configuration drift on systems it manages. It uses Ansible playbooks to automatically apply the necessary changes to bring the system back into compliance with recommended best practices and policies.
 
 
 ## Tips
