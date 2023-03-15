@@ -66,6 +66,9 @@ In order to enter emergency mode or target press `e` at default grub entry. Then
 
 In order to stop the boot process at `initramfs`. Press `e` at the main grub entry and append `rd.break` to kernel line (contains `vmlinuz` keyword). Press `Ctrl-x` to finish booting. Press `Ctrl-X` to boot. After boot System automatically mounts the existing root file system in read only mode at `/sysroot`. You need to remount using read write mode. Afterwards, change the root file system path and update the root password.
 
+> Note: If grub timeout is disabled, you can interrupt the boot process by holding left `SHIFT` key during boot process.
+
+
 ```bash
 # Verify existing mount settings
 mount | grep sysroot
