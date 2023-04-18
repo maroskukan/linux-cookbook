@@ -14,6 +14,8 @@
     - [Managing Services](#managing-services)
   - [Job Control](#job-control)
   - [Networking](#networking)
+    - [Configuration](#configuration)
+    - [Troubleshooting](#troubleshooting)
   - [Date and Time](#date-and-time)
   - [Tools](#tools)
     - [Input-output Redirection](#input-output-redirection)
@@ -315,13 +317,21 @@ isig icanon iexten echo echoe echok -echonl -noflsh -xcase -tostop -echoprt echo
 
 ## Networking
 
+### Configuration
+
 To update system name:
 
 ```bash
 hostnamectl set-hostname linux.example.com
 ```
 
-To update network settings
+To update network settings using network manager daemon you have option to use one of the following methods:
+- Text User Interface (TUI)
+- Command Line Interface (CLI)
+- Web Interface (Cockpit)
+- Automation Tools (Ansible)
+
+Below are some examples of `nmtui` and `nmcli`:
 
 ```bash
 # Menu based settings
@@ -338,6 +348,20 @@ nmcli con up ens192
 vi /etc/sysconfig/network-scripts/ifcfg-ens192
 ```
 
+
+### Troubleshooting
+
+Some common verification tools include `netstat`, `ss`, `tracepath` and `mtr`.
+
+```bash
+netstat -peanut
+```
+
+```bash
+ss -plunt
+```
+
+
 ## Date and Time
 
 ```bash
@@ -352,6 +376,9 @@ timedatectl list-timezones
 # Set timezone
 timedatectl set-timezone America/Sao_Paulo
 ```
+
+In order to help you find a valid timezone name the `tzselect` utility can be used.
+
 
 ## Tools
 
