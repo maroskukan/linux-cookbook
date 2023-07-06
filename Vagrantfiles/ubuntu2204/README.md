@@ -1,6 +1,6 @@
-# Rocky 9 VM Blueprint
+# Ubuntu 22.04 VM Blueprint
 
-The purpose of this Vagrantfile is to provide a ready to use Rocky 9 environment. This version was selected as it uses GRUB2 and Systemd.
+The purpose of this Vagrantfile is to provide a ready to use Ubuntu 22.04 environment. This version was selected as it uses GRUB2 and Systemd.
 
 ## How to provision this VM
 
