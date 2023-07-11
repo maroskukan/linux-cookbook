@@ -2,7 +2,7 @@
 
 The purpose of this Vagrantfile is to provide a ready to use Ubuntu 22.10 environment.
 
-The provisioning shell script will install latest version of Ansible using pip. Then a sample Ansible playbook will be executed.
+The provisioning shell script will install latest version of Ansible using `pip`. Then a sample Ansible playbook will be executed.
 
 ## How to provision this VM
 
