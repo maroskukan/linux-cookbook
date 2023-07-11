@@ -1,0 +1,15 @@
+---
+- name: Gather Facts
+  hosts: all
+  
+  tasks:
+    - name: Gather Ansible and OS Facts
+      setup:
+    
+    - name: Print Ansible Version
+      debug:
+        var: ansible_version.full
+    
+    - name: Print OS Release
+      debug:
+        var: ansible_distribution_release
