@@ -55,6 +55,6 @@ Vagrant.configure("2") do |config|
     sudo dnf install -y container-tools
 
     # Verify that podman is working
-    podman run --rm --rmi docker.io/library/hello-world
+    podman container run --rm --rmi quay.io/podman/hello:latest
   SHELL
 end
