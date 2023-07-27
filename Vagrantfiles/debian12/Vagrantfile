@@ -1,0 +1,35 @@
+# -*- mode: ruby -*-end
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Hyper-V Provider Specific Configuration
+  config.vm.provider "hyperv" do |h|
+    h.enable_virtualization_extensions = true
+    h.linked_clone = true
+    h.memory = 2048
+    h.maxmemory = 2048
+  end
+
+  # VMware Workstation Provider Specific Configuration
+  config.vm.provider "vmware_desktop" do |v|
+    v.vmx["memsize"] = 2048
+    v.vmx["numvcpus"] = 2
+  end
+
+  config.vm.define "debian12" do |debian12|
+    # VM Shared Configuration
+    debian12.vm.box = "maroskukan/debian12"
+    debian12.vm.hostname = "debian12"
+
+    # Hyper-V VM Specific Configuration
+    debian12.vm.provider 'hyperv' do |h, override|
+      override.vm.synced_folder ".", "/vagrant", type: "rsync"
+      override.vm.network "public_network", bridge: "Default Switch"
+    end
+
+    # VMware Workstation VM Specific Configuration
+    debian12.vm.provider 'vmware_desktop' do |v, override|
+      override.vm.synced_folder ".", "/vagrant"
+    end
+  end
+end
