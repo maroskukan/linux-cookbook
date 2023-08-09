@@ -1,15 +1,19 @@
 ---
-- name: Gather Facts
+- name: Deploy Cockpit
   hosts: all
-  
+
   tasks:
-    - name: Gather Ansible and OS Facts
-      setup:
-    
-    - name: Print Ansible Version
-      debug:
-        var: ansible_version.full
-    
-    - name: Print OS Release
-      debug:
-        var: ansible_distribution_release
+    - name: Update package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Cockpit package
+      apt:
+        name: cockpit
+        state: present
+
+    - name: Start Cockpit service
+      systemd:
+        name: cockpit
+        state: started
+        enabled: yes
