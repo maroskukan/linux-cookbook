@@ -1,0 +1,41 @@
+# -*- mode: ruby -*-end
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Hyper-V Provider Specific Configuration
+  config.vm.provider "hyperv" do |h|
+    h.enable_virtualization_extensions = true
+    h.linked_clone = true
+    h.memory = 2048
+    h.maxmemory = 2048
+  end
+
+  # Virtualbox Provider Specific Configuration
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 2048
+    v.cpus = 2
+  end
+
+  # VMware Workstation Provider Specific Configuration
+  config.vm.provider "vmware_desktop" do |v|
+    v.vmx["memsize"] = 2048
+    v.vmx["numvcpus"] = 2
+  end
+
+  config.vm.define "fedora38" do |fedora38|
+    # VM Shared Configuration
+    fedora38.vm.box = "maroskukan/fedora38"
+    fedora38.vm.hostname = "fedora38"
+
+    # Hyper-V VM Specific Configuration
+    fedora38.vm.provider 'hyperv' do |h, override|
+      override.vm.synced_folder ".", "/vagrant", type: "rsync"
+      override.vm.network "public_network", bridge: "Default Switch"
+    end
+
+    # VMware Workstation VM Specific Configuration
+    fedora38.vm.provider 'vmware_desktop' do |v, override|
+      override.vm.synced_folder ".", "/vagrant"
+    end
+  end
+end
