@@ -37,5 +37,10 @@ Vagrant.configure("2") do |config|
     fedora38.vm.provider 'vmware_desktop' do |v, override|
       override.vm.synced_folder ".", "/vagrant"
     end
+
+    # Virtualbox VM Specific Configuration
+    fedora38.vm.provider 'virtualbox' do |v, override|
+      override.vm.synced_folder ".", "/vagrant"
+    end    
   end
 end

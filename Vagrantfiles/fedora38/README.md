@@ -4,7 +4,7 @@ The purpose of this Vagrantfile is to provide a ready to use Fedora 38 environme
 
 ## How to provision this VM
 
-The blueprint supports Microsoft Hyper-V and VMware Workstation backends, simply provision and connect to this VM using Vagrant.
+The blueprint supports Microsoft Hyper-V, VMware Workstation and Oracle VirtualBox backends, simply provision and connect to this VM using Vagrant.
 
 ```bash
 vagrant up && vagrant ssh
